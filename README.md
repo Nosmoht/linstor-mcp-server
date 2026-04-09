@@ -227,7 +227,7 @@ Contributor guidance lives in [CONTRIBUTING.md](/Users/ntbc/workspace/linstor-mc
 - the exact local Go toolchain is pinned with `toolchain go1.26.2`
 - `make check` runs formatting, vetting, module verification, tests, and build
 - `make check-full` adds race, coverage, and fuzz smoke coverage
-- this repository is currently unlicensed for third-party use; see [LICENSE](/Users/ntbc/workspace/linstor-mcp-server/LICENSE)
+- this repository is licensed under MIT; see [LICENSE](/Users/ntbc/workspace/linstor-mcp-server/LICENSE)
 - collaboration expectations are documented in [CODE_OF_CONDUCT.md](/Users/ntbc/workspace/linstor-mcp-server/CODE_OF_CONDUCT.md)
 
 ## Safety Model
