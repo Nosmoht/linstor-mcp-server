@@ -1,0 +1,8 @@
+.DS_Store
+bin/
+dist/
+coverage.out
+*.test
+*.db
+*.db-shm
+*.db-wal
