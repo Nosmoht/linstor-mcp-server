@@ -1,0 +1,26 @@
+{
+  "name": "@linstor-mcp/darwin-arm64",
+  "version": "0.1.0",
+  "description": "linstor-mcp-server binary for macOS ARM64",
+  "license": "MIT",
+  "author": "Thomas Krahn",
+  "homepage": "https://github.com/Nosmoht/linstor-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/Nosmoht/linstor-mcp-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nosmoht/linstor-mcp-server.git"
+  },
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "bin": {
+    "linstor-mcp-server": "bin/linstor-mcp-server"
+  },
+  "files": [
+    "bin/linstor-mcp-server"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

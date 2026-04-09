@@ -12,7 +12,9 @@ func TestStoreJobIdempotency(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewStore() error = %v", err)
 	}
-	defer store.Close()
+	defer func() {
+		_ = store.Close()
+	}()
 
 	ctx := context.Background()
 	plan := PlanRecord{
@@ -57,7 +59,9 @@ func TestStorePlanRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewStore() error = %v", err)
 	}
-	defer store.Close()
+	defer func() {
+		_ = store.Close()
+	}()
 
 	ctx := context.Background()
 	plan := PlanRecord{
@@ -96,7 +100,9 @@ func TestStoreUpdateJob(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewStore() error = %v", err)
 	}
-	defer store.Close()
+	defer func() {
+		_ = store.Close()
+	}()
 
 	ctx := context.Background()
 	plan := PlanRecord{

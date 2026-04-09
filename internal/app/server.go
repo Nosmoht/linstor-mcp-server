@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/ntbc/linstor-mcp-server/internal/config"
@@ -36,7 +37,7 @@ func New(ctx context.Context, cfg config.Config) (*Server, error) {
 	}
 	linstorClient, err := linstor.New(ctx, cfg, kubeClient)
 	if err != nil {
-		store.Close()
+		_ = store.Close()
 		return nil, err
 	}
 	s := &Server{
@@ -72,7 +73,7 @@ func (s *Server) RunHTTP(ctx context.Context) error {
 	handler := mcp.NewStreamableHTTPHandler(func(*http.Request) *mcp.Server {
 		return s.mcp
 	}, nil)
-	s.httpSrv = &http.Server{Addr: s.cfg.HTTPAddr, Handler: handler}
+	s.httpSrv = &http.Server{Addr: s.cfg.HTTPAddr, Handler: handler, ReadHeaderTimeout: 30 * time.Second}
 	go func() {
 		<-ctx.Done()
 		_ = s.httpSrv.Close()

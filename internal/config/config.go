@@ -91,6 +91,7 @@ func Load(flags FlagValues) (Config, error) {
 }
 
 func defaultConfig() Config {
+	// #nosec G101 -- these are non-secret operator defaults and Kubernetes object names.
 	return Config{
 		ServerName:          DefaultName,
 		ServerVersion:       Version,
@@ -107,7 +108,7 @@ func defaultConfig() Config {
 }
 
 func mergeConfigFile(path string, cfg *Config) error {
-	b, err := os.ReadFile(path)
+	b, err := os.ReadFile(path) // #nosec G304,G703 -- config path is intentionally operator-supplied.
 	if err != nil {
 		return fmt.Errorf("read config file %q: %w", path, err)
 	}

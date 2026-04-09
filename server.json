@@ -1,0 +1,92 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Nosmoht/linstor-mcp-server",
+  "title": "LINSTOR MCP Server",
+  "description": "Safely manage LINSTOR and the Piraeus operator through a staged MCP workflow. 7 tools for environment validation, inventory reads, planning, apply, and job tracking.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/Nosmoht/linstor-mcp-server",
+    "source": "https://github.com/Nosmoht/linstor-mcp-server"
+  },
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "Nosmoht/linstor-mcp-server",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "LINSTOR_MCP_CONFIG",
+          "description": "Path to config.toml",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_PROFILE",
+          "description": "Configuration profile name override (default: homelab)",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_KUBE_CONTEXT",
+          "description": "Kubernetes context override",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_LINSTOR_CLUSTER",
+          "description": "LINSTOR cluster name override",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_CONTROLLER_MODE",
+          "description": "Controller access mode (default: port-forward)",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_CONTROLLER_URL",
+          "description": "Direct LINSTOR controller URL override",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_CONTROLLER_SERVICE",
+          "description": "LINSTOR controller service name",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_CONTROLLER_NAMESPACE",
+          "description": "LINSTOR controller namespace",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_TLS_CA_SECRET",
+          "description": "Kubernetes secret containing the controller CA bundle",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_TLS_CLIENT_SECRET",
+          "description": "Kubernetes secret containing the client certificate and key",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_STATE_DIR",
+          "description": "State directory used for plans and job records",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_HTTP_ADDR",
+          "description": "Beta Streamable HTTP listen address",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_ENABLE_HTTP_BETA",
+          "description": "Enable beta Streamable HTTP transport",
+          "isRequired": false
+        },
+        {
+          "name": "LINSTOR_MCP_LOG_FORMAT",
+          "description": "Log format override: text or json",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

@@ -36,7 +36,7 @@ func TestLoadEnvOverride(t *testing.T) {
 
 func TestLoadHTTPRequiresBeta(t *testing.T) {
 	cfgPath := t.TempDir() + "/config.toml"
-	if err := os.WriteFile(cfgPath, []byte("http_addr = \":8080\"\n"), 0o644); err != nil {
+	if err := os.WriteFile(cfgPath, []byte("http_addr = \":8080\"\n"), 0o600); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 	if _, err := Load(FlagValues{ConfigPath: cfgPath}); err == nil {

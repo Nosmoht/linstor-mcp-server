@@ -2,7 +2,6 @@ package linstor
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -19,12 +18,8 @@ func TestControllerVersion(t *testing.T) {
 	defer srv.Close()
 
 	client := &Client{
-		baseURL: srv.URL,
-		httpClient: &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // test server only
-			},
-		},
+		baseURL:    srv.URL,
+		httpClient: srv.Client(),
 	}
 	got, err := client.ControllerVersion(context.Background())
 	if err != nil {
@@ -45,12 +40,8 @@ func TestNodes(t *testing.T) {
 	defer srv.Close()
 
 	client := &Client{
-		baseURL: srv.URL,
-		httpClient: &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // test server only
-			},
-		},
+		baseURL:    srv.URL,
+		httpClient: srv.Client(),
 	}
 	got, err := client.Nodes(context.Background())
 	if err != nil {

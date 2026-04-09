@@ -1,0 +1,15 @@
+version: "2"
+linters:
+  default: standard
+  disable:
+    - revive
+  enable:
+    - gosec
+    - errorlint
+    - gocritic
+issues:
+  exclude-rules:
+    - linters:
+        - gosec
+      path: internal/config/config.go
+      text: "G101|G304"

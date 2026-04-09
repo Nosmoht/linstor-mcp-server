@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	_ "modernc.org/sqlite"
+	_ "modernc.org/sqlite" // Register the pure-Go SQLite driver used for plan/job state.
 )
 
 type Store struct {
@@ -18,7 +18,7 @@ type Store struct {
 }
 
 func NewStore(stateDir string) (*Store, error) {
-	if err := os.MkdirAll(stateDir, 0o755); err != nil {
+	if err := os.MkdirAll(stateDir, 0o750); err != nil {
 		return nil, err
 	}
 	db, err := sql.Open("sqlite", filepath.Join(stateDir, "state.db"))
@@ -27,7 +27,7 @@ func NewStore(stateDir string) (*Store, error) {
 	}
 	s := &Store{db: db}
 	if err := s.migrate(); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 	return s, nil

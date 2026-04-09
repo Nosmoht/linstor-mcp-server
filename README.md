@@ -1,25 +1,36 @@
 # LINSTOR MCP Server
 
-`linstor-mcp-server` is a Go MCP server for LINSTOR and the Piraeus operator.
+[![CI](https://github.com/Nosmoht/linstor-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/Nosmoht/linstor-mcp-server/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Nosmoht/linstor-mcp-server?sort=semver)](https://github.com/Nosmoht/linstor-mcp-server/releases)
+[![Go Reference](https://pkg.go.dev/badge/github.com/ntbc/linstor-mcp-server.svg)](https://pkg.go.dev/github.com/ntbc/linstor-mcp-server)
+[![codecov](https://codecov.io/gh/Nosmoht/linstor-mcp-server/graph/badge.svg)](https://codecov.io/gh/Nosmoht/linstor-mcp-server)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ntbc/linstor-mcp-server)](https://goreportcard.com/report/github.com/ntbc/linstor-mcp-server)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Nosmoht/linstor-mcp-server/badge)](https://scorecard.dev/viewer/?uri=github.com/Nosmoht/linstor-mcp-server)
+[![License](https://img.shields.io/github/license/Nosmoht/linstor-mcp-server)](LICENSE)
 
-## Status
+`linstor-mcp-server` is a Go MCP server for LINSTOR and the Piraeus operator. It exposes canonical inventory reads plus a staged cluster-configuration write flow designed for stateful infrastructure: plan first, review the diff, then apply only while the target state is still fresh.
 
-This repository contains the first usable v1 MVP.
+Desired state comes from `piraeus.io/v1` CRDs. Runtime state comes from the LINSTOR controller API.
 
-What that means:
+## Installation
 
-- `stdio` transport is the primary mode.
-- Streamable HTTP exists behind `--enable-http-beta`.
-- Safe GA tools only:
-  - `validate_environment`
-  - `inventory_list`
-  - `inventory_get`
-  - `plan_cluster_config`
-  - `apply_plan`
-  - `job_get`
-  - `job_cancel`
-- Cluster mutations are limited to `LinstorCluster`, `LinstorSatelliteConfiguration`, and `LinstorNodeConnection`.
-- Existing CSI-backed production resources are treated as read-only.
+**Via npm** (no Go required, Linux/macOS, amd64/arm64):
+
+```bash
+npx linstor-mcp
+```
+
+**Download binary** (Linux/macOS, amd64/arm64):
+
+Download the latest release from [GitHub Releases](https://github.com/Nosmoht/linstor-mcp-server/releases), extract it, and place `linstor-mcp-server` in your `$PATH`.
+
+**Build from source** (requires Go `1.26.2`):
+
+```bash
+git clone https://github.com/Nosmoht/linstor-mcp-server
+cd linstor-mcp-server
+make build
+```
 
 ## Supported Versions
 
@@ -39,151 +50,11 @@ Pinned and currently validated:
   - Codex CLI `0.118.0`
   - Claude Code `2.1.97`
 
-## Quickstart
+## Configuration
 
-Build:
+The built-in `homelab` profile is the default. Configuration precedence is:
 
-```bash
-make build
-```
-
-Run with the built-in `homelab` profile:
-
-```bash
-make run
-```
-
-Add to Codex CLI:
-
-```bash
-codex mcp add linstor -- ./bin/linstor-mcp-server
-```
-
-Add to Claude Code:
-
-```bash
-claude mcp add linstor -- ./bin/linstor-mcp-server
-```
-
-## Claude Code Helpers
-
-This repo includes project-local Claude Code helpers under `.claude/`.
-
-Skills:
-
-- `linstor-mcp-guardrails`
-  - background knowledge skill
-  - not intended for direct invocation
-  - keeps Claude aligned with this repo's safety rules, authority boundaries,
-    and validation workflow
-- `/plan-linstor-mcp-change`
-  - manual planning workflow for MCP surface, planner/apply, transport, config,
-    and contributor-workflow changes
-  - pulls repo context first and uses current upstream facts when needed
-- `/validate-linstor-mcp`
-  - manual validation workflow
-  - prefers repo checks first and only uses read-only homelab checks when live
-    validation is needed
-
-Project subagents:
-
-- `linstor-safety-reviewer`
-  - reviews ownership boundaries, stale-plan protections, and mutation safety
-- `mcp-contract-reviewer`
-  - reviews tool contracts, resource URIs, schema drift, and transport behavior
-- `upstream-doc-researcher`
-  - checks `kb-server` first, then official upstream docs for current facts
-
-Typical usage:
-
-```text
-/plan-linstor-mcp-change add a new inventory filter for storage pools
-/validate-linstor-mcp internal/app
-Use linstor-safety-reviewer to review this planner change
-Use mcp-contract-reviewer to review this HTTP transport change
-```
-
-Safety boundary:
-
-- these helpers are for planning, review, and validation
-- live cluster activity stays read-only by default
-- they must not be used to mutate `LinstorSatellite`
-
-## What You Can Do Now
-
-- Validate the active kube context and LINSTOR controller connection.
-- List canonical cluster, satellite configuration, node connection, node, storage-pool, resource-definition, and resource inventory.
-- Read single canonical objects using semantic IDs.
-- Create a safe `plan_cluster_config` plan for:
-  - `cluster`
-  - `satellite_configuration`
-  - `node_connection`
-- Apply a fresh plan with `apply_plan`.
-- Track jobs with `job_get` and `job_cancel`.
-
-## What Is Intentionally Not In GA Yet
-
-- destructive operations
-- snapshots, backups, remotes, schedules
-- failover, rebalance, evacuation
-- direct mutation of live CSI-backed production resources
-- broad HTTP deployment and OAuth flows
-
-## Tool Reference
-
-### `validate_environment`
-
-Returns:
-
-- active kube context
-- LINSTOR cluster name
-- controller/API version
-- default storage class
-- basic health checks
-
-### `inventory_list`
-
-Arguments:
-
-- `kind`
-- `name_prefix`
-- `node`
-- `owner`
-- `limit`
-- `cursor`
-
-### `inventory_get`
-
-Arguments:
-
-- `kind`
-- `id`
-
-### `plan_cluster_config`
-
-Arguments:
-
-- `kind`: `cluster`, `satellite_configuration`, `node_connection`
-- `name`
-- `operation`: `create`, `update`, `reconcile`
-- `spec`
-
-Returns a `plan_id`, diff, summary, preconditions, and expiry timestamp.
-
-### `apply_plan`
-
-Arguments:
-
-- `plan_id`
-- `idempotency_key`
-
-The apply step revalidates the kube context and target object identity/version before mutating anything.
-
-### `job_get`, `job_cancel`
-
-Inspect or cancel apply jobs.
-
-## Config
+`flags > env > config file > built-in profile defaults`
 
 Optional `config.toml`:
 
@@ -196,48 +67,213 @@ controller_service = "linstor-controller"
 controller_namespace = "piraeus-datastore"
 tls_ca_secret = "linstor-api-tls"
 tls_client_secret = "linstor-client-tls"
+state_dir = "~/.local/state/linstor-mcp-server"
+http_addr = ""
+enable_http_beta = false
+log_format = "text"
 ```
 
-Precedence is `flags > env > config file > built-in profile defaults`.
+Environment overrides:
 
-Important default for `homelab`:
+| Variable | Default | Description |
+|---|---|---|
+| `LINSTOR_MCP_CONFIG` | unset | Path to `config.toml` |
+| `LINSTOR_MCP_PROFILE` | `homelab` | Configuration profile name |
+| `LINSTOR_MCP_KUBE_CONTEXT` | from profile | Kubernetes context override |
+| `LINSTOR_MCP_LINSTOR_CLUSTER` | from profile | LINSTOR cluster name override |
+| `LINSTOR_MCP_CONTROLLER_MODE` | `port-forward` | Controller access mode |
+| `LINSTOR_MCP_CONTROLLER_URL` | unset | Direct controller URL override |
+| `LINSTOR_MCP_CONTROLLER_SERVICE` | `linstor-controller` | Controller service name |
+| `LINSTOR_MCP_CONTROLLER_NAMESPACE` | `piraeus-datastore` | Controller namespace |
+| `LINSTOR_MCP_TLS_CA_SECRET` | `linstor-api-tls` | Secret containing controller CA trust |
+| `LINSTOR_MCP_TLS_CLIENT_SECRET` | `linstor-client-tls` | Secret containing client cert/key |
+| `LINSTOR_MCP_STATE_DIR` | `~/.local/state/linstor-mcp-server` | State directory for plans and jobs |
+| `LINSTOR_MCP_HTTP_ADDR` | unset | Beta Streamable HTTP listen address |
+| `LINSTOR_MCP_ENABLE_HTTP_BETA` | `false` | Enable beta HTTP transport |
+| `LINSTOR_MCP_LOG_FORMAT` | `text` | Log format: `text` or `json` |
+
+Important `homelab` defaults:
 
 - the server opens its own Kubernetes port-forward to `svc/linstor-controller:3371`
 - controller TLS trust is loaded from `linstor-api-tls`
 - client certs are loaded from `linstor-client-tls`
 
-## Development Workflow
+## Client Setup
 
-Standard commands:
+### Claude Code
+
+Add to your project's `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "linstor": {
+      "command": "npx",
+      "args": ["-y", "linstor-mcp"]
+    }
+  }
+}
+```
+
+If you prefer a local binary, replace `"command": "npx"` with the path to `linstor-mcp-server`.
+
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "linstor": {
+      "command": "npx",
+      "args": ["-y", "linstor-mcp"]
+    }
+  }
+}
+```
+
+### OpenAI Codex
+
+Add to `.codex/config.toml` (project) or `~/.codex/config.toml` (global):
+
+```toml
+[mcp_servers.linstor]
+command = "npx"
+args = ["-y", "linstor-mcp"]
+
+[mcp_servers.linstor.env]
+LINSTOR_MCP_CONFIG = "/path/to/config.toml"
+```
+
+### Generic MCP client
+
+The server speaks the [MCP protocol](https://modelcontextprotocol.io) over stdio:
 
 ```bash
+./linstor-mcp-server
+```
+
+## Tools
+
+### Read-only
+
+| Tool | Description |
+|---|---|
+| `validate_environment` | Validate Kubernetes access, LINSTOR controller connectivity, default storage class, and core homelab assumptions. |
+| `inventory_list` | List canonical inventory across clusters, satellite configurations, node connections, nodes, storage pools, resource definitions, and resources. |
+| `inventory_get` | Read one canonical inventory object by semantic kind and ID. |
+| `job_get` | Fetch the current status of a previously started apply job. |
+
+### Staged writes
+
+| Tool | Description | Guards |
+|---|---|---|
+| `plan_cluster_config` | Create a 5-minute plan for `LinstorCluster`, `LinstorSatelliteConfiguration`, or `LinstorNodeConnection` without mutating the cluster. | no live mutation; returns diff, summary, and preconditions |
+| `apply_plan` | Apply a previously created plan. | requires `plan_id`, `idempotency_key`, fresh plan, and stale-state revalidation |
+| `job_cancel` | Cancel a pending or running apply job if it has not already completed. | no effect once terminal |
+
+## Safety Model
+
+### Trust Boundaries
+
+```text
+MCP Client (Claude Code / Codex)
+        |  stdio / JSON-RPC
+        v
+  linstor-mcp-server
+        |  Kubernetes API + LINSTOR controller API
+        v
+Piraeus operator CRDs + LINSTOR runtime state
+```
+
+### Safety Mechanisms
+
+| Mechanism | How it works |
+|---|---|
+| Staged writes | Every write is two-step: `plan_cluster_config` then `apply_plan` |
+| Plan expiry | Plans expire after 5 minutes |
+| Fresh-state refusal | `apply_plan` revalidates kube context plus target identity/version before mutating anything |
+| Idempotency | `apply_plan` requires an `idempotency_key` and reuses the same job record on retries |
+| Scoped writes | Mutations are limited to `LinstorCluster`, `LinstorSatelliteConfiguration`, and `LinstorNodeConnection` |
+| Protected production resources | Existing CSI-backed production resources are treated as read-only |
+
+### Intentionally Unsupported in GA
+
+- destructive operations
+- snapshots, backups, remotes, and schedules
+- failover, rebalance, and evacuation
+- direct mutation of existing CSI-backed production resources
+- mutation of `LinstorSatellite`
+- broad HTTP deployment and OAuth flows
+
+### HTTP transport status
+
+Streamable HTTP exists behind `--enable-http-beta` and `LINSTOR_MCP_ENABLE_HTTP_BETA=true`. It is beta-only and currently intended for trusted environments; the repository does not yet define a public auth story for HTTP mode.
+
+## Verifying Downloads
+
+### Checksums (integrity)
+
+Each release includes a `linstor-mcp-server_<version>_checksums.txt` file with SHA-256 hashes of all archives. Verify the binary after downloading:
+
+```bash
+curl -LO https://github.com/Nosmoht/linstor-mcp-server/releases/download/v<version>/linstor-mcp-server_<version>_linux_amd64.tar.gz
+curl -LO https://github.com/Nosmoht/linstor-mcp-server/releases/download/v<version>/linstor-mcp-server_<version>_checksums.txt
+
+sha256sum --check --ignore-missing linstor-mcp-server_<version>_checksums.txt
+```
+
+### GitHub artifact attestations
+
+Each release includes GitHub-native build provenance:
+
+```bash
+gh attestation verify linstor-mcp-server_<version>_linux_amd64.tar.gz \
+  --repo Nosmoht/linstor-mcp-server
+```
+
+### npm package provenance
+
+The npm packages are published with provenance attestation:
+
+```bash
+npm audit signatures
+```
+
+## Claude Code Helpers
+
+This repo includes project-local Claude Code helpers under `.claude/`.
+
+- `linstor-mcp-guardrails`
+  - background knowledge skill
+  - not intended for direct invocation
+  - keeps Claude aligned with this repo's safety rules, authority boundaries, and validation workflow
+- `/plan-linstor-mcp-change`
+  - planning workflow for MCP surface, planner/apply, transport, config, and contributor workflow changes
+- `/validate-linstor-mcp`
+  - validation workflow that prefers repo checks first and only uses read-only homelab checks when live validation is needed
+
+Project subagents:
+
+- `linstor-safety-reviewer`
+- `mcp-contract-reviewer`
+- `upstream-doc-researcher`
+
+## Development
+
+```bash
+make build
 make check
 make check-full
-make test
-make test-race
 make coverage
-make fuzz-smoke
+make run
 ```
 
 Contributor guidance lives in [CONTRIBUTING.md](/Users/ntbc/workspace/linstor-mcp-server/CONTRIBUTING.md).
 
-## Repository Policy
+## License
 
-- dependency versions are pinned in `go.mod` and `go.sum`
-- the exact local Go toolchain is pinned with `toolchain go1.26.2`
-- `make check` runs formatting, vetting, module verification, tests, and build
-- `make check-full` adds race, coverage, and fuzz smoke coverage
-- this repository is licensed under MIT; see [LICENSE](/Users/ntbc/workspace/linstor-mcp-server/LICENSE)
-- collaboration expectations are documented in [CODE_OF_CONDUCT.md](/Users/ntbc/workspace/linstor-mcp-server/CODE_OF_CONDUCT.md)
-
-## Safety Model
-
-- Every write is two-step: `plan_cluster_config` then `apply_plan`.
-- Plans expire after 5 minutes.
-- `apply_plan` requires an `idempotency_key`.
-- Apply-time revalidation checks kube context plus object identity/version.
-- Deletes, live evacuations, failover, and mutations of existing CSI-backed resources are intentionally out of GA scope.
-- `piraeus.io/v1` CRDs are the desired-state source of truth.
+[MIT](LICENSE)
 - The LINSTOR controller API is the runtime-state source of truth.
 - `internal.linstor.linbit.com` resources are diagnostics only.
 

@@ -1,0 +1,41 @@
+{
+  "name": "linstor-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for LINSTOR and the Piraeus operator with staged plan/apply safety",
+  "license": "MIT",
+  "author": "Thomas Krahn",
+  "homepage": "https://github.com/Nosmoht/linstor-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/Nosmoht/linstor-mcp-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nosmoht/linstor-mcp-server.git"
+  },
+  "keywords": [
+    "mcp",
+    "linstor",
+    "piraeus",
+    "kubernetes",
+    "storage",
+    "operator",
+    "model-context-protocol",
+    "claude",
+    "ai-agent"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "linstor-mcp": "bin/run.js"
+  },
+  "files": [
+    "bin/run.js"
+  ],
+  "optionalDependencies": {
+    "@linstor-mcp/linux-x64": "0.1.0",
+    "@linstor-mcp/linux-arm64": "0.1.0",
+    "@linstor-mcp/darwin-x64": "0.1.0",
+    "@linstor-mcp/darwin-arm64": "0.1.0"
+  }
+}

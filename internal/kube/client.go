@@ -163,7 +163,7 @@ func (c *Client) StartPortForward(ctx context.Context, namespace, service string
 		return nil, err
 	}
 	localPort := localLn.Addr().(*net.TCPAddr).Port
-	localLn.Close()
+	_ = localLn.Close()
 
 	hostIP := strings.TrimPrefix(c.RESTConfig.Host, "https://")
 	hostIP = strings.TrimPrefix(hostIP, "http://")
