@@ -79,7 +79,9 @@ For live-cluster validation, prefer read-only checks unless the change is explic
 
 ## Commit messages
 
-This project uses [conventional commits](https://www.conventionalcommits.org/). Use scoped prefixes where practical:
+This project uses [conventional commits](https://www.conventionalcommits.org/). Tags and releases are created automatically from conventional changes merged to `main`, so PR titles and squash commit messages must follow the format.
+
+Use scoped prefixes where practical:
 
 - `feat(scope):`
 - `fix(scope):`
@@ -93,8 +95,23 @@ This project uses [conventional commits](https://www.conventionalcommits.org/). 
 
 1. Fork the repo and create a branch from `main`
 2. Ensure `make check` passes locally
-3. Fill in the PR template
-4. Keep each PR to one logical change
+3. Use a Conventional Commit PR title such as `feat(release): automate version tagging`
+4. Fill in the PR template
+5. Keep each PR to one logical change
+
+## Automated release model
+
+- Do not create release tags manually.
+- Merge to `main` with a conventional PR title.
+- Auto-tagging determines the version bump from merged conventional changes.
+- The generated `v*` tag triggers the GitHub release workflow and npm publish workflow.
+
+Repo-admin prerequisites for full automation:
+
+- `RELEASE_APP_ID` GitHub Actions variable
+- `RELEASE_APP_PRIVATE_KEY` GitHub Actions secret
+- `PROJECT_NUMBER` GitHub Actions variable for issue/project sync
+- npm Trusted Publisher configuration for `linstor-mcp` and the platform packages
 
 ## Claude Code Support
 

@@ -1,0 +1,28 @@
+name: PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  conventional-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Conventional Commit style PR title
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            const re = /^(feat|fix|docs|ci|chore|refactor|test)(\([a-z0-9._/-]+\))?!?: .+/;
+            if (!re.test(title)) {
+              core.setFailed(
+                `PR title "${title}" is not a Conventional Commit. ` +
+                `Expected format like "feat(scope): description" or "fix(scope)!: description".`
+              );
+            } else {
+              core.info(`Valid conventional PR title: ${title}`);
+            }

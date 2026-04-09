@@ -20,6 +20,8 @@ Desired state comes from `piraeus.io/v1` CRDs. Runtime state comes from the LINS
 npx linstor-mcp
 ```
 
+Note: npm and binary installs become available only after the automated release pipeline has published the first tagged release.
+
 **Download binary** (Linux/macOS, amd64/arm64):
 
 Download the latest release from [GitHub Releases](https://github.com/Nosmoht/linstor-mcp-server/releases), extract it, and place `linstor-mcp-server` in your `$PATH`.
@@ -239,6 +241,16 @@ The npm packages are published with provenance attestation:
 ```bash
 npm audit signatures
 ```
+
+## Release Automation
+
+This repository is configured for automated semantic versioning and releases.
+
+- merge conventional changes to `main`
+- the auto-tag workflow creates the next `v*` tag
+- the release workflow publishes GitHub artifacts, attestations, and npm packages
+
+Manual tag creation is not the intended release path.
 
 ## Claude Code Helpers
 
