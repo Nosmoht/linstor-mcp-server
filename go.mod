@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	github.com/modelcontextprotocol/go-sdk v1.5.0
-	github.com/pelletier/go-toml/v2 v2.3.0
+	github.com/pelletier/go-toml/v2 v2.3.1
 	k8s.io/apimachinery v0.35.3
 	k8s.io/client-go v0.35.3
 	modernc.org/sqlite v1.48.1
